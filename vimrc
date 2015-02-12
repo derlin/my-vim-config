@@ -1,30 +1,98 @@
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+ " Maintainer: 
+ "      Lucy Linder
+ "
+ " Version: 
+ "       1.0 - 11/02/15 15:43:36
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 scriptencoding utf-8
 
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => General
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" for theme colors
-set t_Co=256
-colorscheme kolor
+" Use Vim defaults instead of 100% vi compatibility
+set nocompatible 
+
+" Behave like BASH on filename completion (complete the longest
+" and then show a list of options)
+set wildmode=longest:full
+set wildmenu
+
+" Show the cursor position all the time
+set ruler 
+
+" Enable syntax highlighting
+syntax enable
+
+" Set color theme
+try
+    colorscheme desert
+    " Or use Kolor theme colors (see https://github.com/zeis/vim-kolor)
+    " set t_Co=256
+    " colorscheme kolor
+catch
+endtry
+ 
+set background=dark
+ 
+" Set extra options when running in GUI mode
+if has("gui_running")
+    set guioptions-=T
+    set guioptions-=e
+    set t_Co=256
+    set guitablabel=%M\ %t
+endif
 
 
-set nocompatible
+" Enable filetype plugins
+filetype plugin on
+filetype indent on
 
-" tabs and such
-set number
-" set paste
-set expandtab
-set tabstop=4
-set softtabstop=4
-set shiftwidth=4
+" Always show the tab line, even when only one tab
+set showtabline=2
 
-" to avoid Press enter to continue:
+" Set utf8 as standard encoding and en_US as the standard language
+set encoding=utf8
+ 
+" Use Unix as the standard file type
+set ffs=unix,dos,mac
+
+" Set to auto read when a file is changed from the outside
+set autoread
+
+" Configure backspace so it acts as it should act
+set backspace=eol,start,indent
+set whichwrap+=<,>,h,l
+
+" Avoid the "Press enter to continue:" message
 set cmdheight=2
 
-" enable backup
-set backupdir=~/.vim/backup//
-set backup
-set directory=~/.vim/backup//
-set noswapfile
+" Automatically show line numbers
+set number
+     
+" Remember info about open buffers on close
+set viminfo^=%
 
+" With a map leader it's possible to do extra key combinations
+" like <leader>w saves the current file
+let mapleader = ","
+let g:mapleader = ","
+
+" Suffixes that get lower priority when doing tab completion for filenames.
+" These are files we are not likely to want to edit or read.
+set suffixes=.bak,~,.swp,.o,.info,.aux,.log,.dvi,.bbl,.blg,.brf,.cb,.ind,.idx,.ilg,.inx,.out,.toc,.png,.jpg
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => backups, history and undo
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" BACKUP
+set backupdir=~/.vim/backup   " Save backup in the .vim dir
+set directory=~/.vim/backup   
+set backup                    " Enable backup
+set noswapfile                " Turn off swap files
 
 " enable persistant undo
 set undofile                " Save undo's after file closes
@@ -32,100 +100,186 @@ set undodir=~/.vim/undo     " where to save undo histories
 set undolevels=1000         " How many undos
 set undoreload=10000        " number of lines to save for undo
 
-filetype plugin indent on
-set cindent
-set autoindent
-set smartindent
+" Sets how many lines of history VIM has to remember
+set history=700
 
-" ctags list
-let Tlist_Ctags_Cmd = "/usr/bin/ctags"
-let Tlist_WinWidth = 50
-map <F4> :TlistToggle<cr>
-map <F3> :!/usr/bin/ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
-
-map <F1> :call LAutoRefactor()<CR>
-
-" search 
-set incsearch " incremental with highlight
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Search and highligh
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Makes search act like search in modern browsers
 set incsearch
-set noignorecase
-set infercase
 
-" backspace : classic usage
-set backspace=indent,eol,start
+" Show matching brackets when text indicator is over them
+set showmatch
 
-" include vimrc from home, if any
-" if filereadable(expand("~/.vim/vimrc"))
-"    source ~/.vim/vimrc
-" endif
+" How many tenths of a second to blink when matching brackets
+set mat=2
 
-" syntax
-if has("syntax")
-    syntax on
-endif
-set showmatch " show matching braces
+" Don't ignore case when searching
+set ignorecase
 
-" automatic reload of files with outside changes
-set autoread
+" When searching try to be smart about cases 
+set smartcase " 
+ 
+" Highlight search results
+set hlsearch
 
-" statusbar
-set laststatus=2
-set statusline=
-set statusline+=%0*\[%n]                                  "buffernr
-set statusline+=%0*\ %<%F\                                "File+path
-set statusline+=%0*\ %y\                                  "FileType
-set statusline+=%0*\ %{''.(&fenc!=''?&fenc:&enc).''}      "Encoding
-set statusline+=%0*\ %{(&bomb?\",BOM\":\"\")}\            "Encoding2
-set statusline+=%0*\ %{&ff}\                              "FileFormat (dos/unix..) 
-set statusline+=%0*\ %=\ row:%l/%L\ (%3p%%)\              "Rownumber/total (%)
-set statusline+=%0*\ col:%3c\                             "Colnr
-set statusline+=%1*\ \ %m%r%w\ %P\ \                      "Modified? Readonly? Top/bot.
-
-hi StatusLine term=reverse ctermfg=white ctermbg=black
-hi User1 ctermfg=white ctermbg=black
-
-" Windows
-nmap <silent> <space><Up> :wincmd k<CR>
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Windows and tabs
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Windows: use space+arrow to move around windows
+nmap <silent> <space><Up> :wincmd k<CR>    
 nmap <silent> <space><Down> :wincmd j<CR>
 nmap <silent> <space><Left> :wincmd h<CR>
 nmap <silent> <space><Right> :wincmd l<CR>
 
 " Tabs
-nmap ,t :tabnew<cr>
-nmap ,w :tabclose<cr>
-nmap <C-Left> :tabprevious <CR>
+nmap <leader>t :tabnew<cr>     " ,t to open an new tab
+nmap <leader>x :tabclose<cr>   " ,x to close the current tab
+" Ctrl+arrow to move around tabs 
+nmap <C-Left> :tabprevious <CR>     "
 nmap <C-Right> :tabnext <CR>
+" Alt+arrow to move tabs around
 nmap <silent> <A-Left> :execute 'silent! tabmove ' . (tabpagenr()-2)<CR>
 nmap <silent> <A-Right> :execute 'silent! tabmove ' . (tabpagenr())<CR>
 
-" shortcuts
-" insert new line without entering insert mode (space + enter)
+" Opens a new tab with the current buffer's path
+" Super useful when editing files in the same directory
+map <leader>te :tabedit <c-r>=expand("%:p:h")<cr>/
+
+
+" Switch CWD to the directory of the open buffer
+map <leader>cd :cd %:p:h<cr>:pwd<cr>
+
+" Insert new line without entering insert mode with space+enter
 nnoremap <space><ENTER> o<ESC>
-" paste the last yanked (and not deleted) content with control+p
+" Paste the last yanked (and not deleted) content with control+p
 nnoremap <C-p> "0p
-" paste above line the last yanked (and not deleted) content using
+
+" Paste above line the last yanked (and not deleted) content using
 " ctrl+"<"+p
 nnoremap <lt><C-P> "0P
-" copy
+
+" Copy shortcut (ctrl+c)
+" Note: map <C-c> "+ygv  does not work since my vim is compiled without the clipboard support
 map <C-c> :w !xsel -i -b<CR>
-" map <C-c> "+ygv   this does not work since my vim is compiled without the clipboard support
-" select all
+
+" Select all with ctrl+A
 map <C-a> ggVG
-" toggle undo tree view
-nnoremap  <F5>  :UndotreeToggle<cr> 
-" toggle paste
+
+" Toggle paste mode with F2
 map <F2> :set paste!<Bar>set paste?<CR>
 
-" dropdown spellchecker: use \s when the cursor is on the mispelled word
-:nnoremap \s a<C-X><C-S>
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Plugins
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" permettre l'insertion d'un unique char via s 
+"" undotree: http://www.vim.org/scripts/script.php?script_id=4177
+" toggle undo tree view by pressing F5 
+nnoremap  <F5>  :UndotreeToggle<cr> 
+
+
+"" ctags: http://www.vim.org/scripts/script.php?script_id=610 and http://ctags.sourceforge.net/
+let Tlist_Ctags_Cmd = "/usr/bin/ctags"
+let Tlist_WinWidth = 50
+map <F4> :TlistToggle<cr>   " Toggle ctags window with F4
+map <F3> :!/usr/bin/ctags -R --c++-kinds=+p --fields=+iaS --extra=+q .<CR>
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Spell checking
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Pressing ,ss will toggle and untoggle spell checking
+map <leader>ss :setlocal spell!<cr>
+
+" Shortcuts using <leader>
+map <leader>sn ]s
+map <leader>sp [s
+map <leader>sa zg
+map <leader>s? z=
+" TODO
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Editing: mappings and utils
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Treat long lines as break lines (useful when moving around in them)
+map j gj
+map k gk
+
+" For when you forget to sudo.. Really Write the file.
+cmap w!! w !sudo tee % >/dev/null
+
+" Insert one char under cursor by pressing ctrl+s
 function! RepeatChar(char, count)
        return repeat(a:char, a:count)
 endfunction
 nnoremap s :<C-U>exec "normal i".RepeatChar(nr2char(getchar()), v:count1)<CR>
 nnoremap S :<C-U>exec "normal a".RepeatChar(nr2char(getchar()), v:count1)<CR>
 
+" Move a line of text using ALT+[up|down] or Comamnd+[up|down] on mac
+nmap <A-Up>     mz:m-2<cr>`z
+nmap <A-Down>   mz:m+<cr>`z
+vmap <A-Up>     :m'<-2<cr>`>my`<mzgv`yo`z
+vmap <A-Down>   :m'>+<cr>`<my`>mzgv`yo`z
+
+" Remap VIM 0 to first non-blank character
+map 0 ^
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Text, tab and indent related
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Use spaces instead of tabs
+set expandtab
+
+" Be smart when using tabs ;)
+set smarttab
+
+" 1 tab == 4 spaces
+set shiftwidth=4
+set tabstop=4
+set softtabstop=4
+
+" Linebreak on 500 characters
+set lbr
+set tw=500
+
+set ai      "Auto indent
+set si      "Smart indent
+set wrap    "Wrap lines
+
+" Set tabstop, softtabstop and shiftwidth to the same value
+command! -nargs=* Stab call Stab()
+function! Stab()
+    let l:tabstop = 1 * input('set tabstop = softtabstop = shiftwidth = ')
+    if l:tabstop > 0
+        let &l:sts = l:tabstop
+        let &l:ts = l:tabstop
+        let &l:sw = l:tabstop
+    endif
+    call SummarizeTabs()
+endfunction
+
+function! SummarizeTabs()
+    try
+        echohl ModeMsg
+        echon 'tabstop='.&l:ts
+        echon ' shiftwidth='.&l:sw
+        echon ' softtabstop='.&l:sts
+        if &l:et
+            echon ' expandtab'
+        else
+            echon ' noexpandtab'
+        endif
+    finally
+        echohl None
+    endtry
+endfunction
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => File types
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " JR
 autocmd BufNewFile,BufReadPost *.jr set filetype=jr
@@ -147,23 +301,123 @@ autocmd BufNewFile,BufReadPost *.txt set wrap linebreak nolist nocin
 " for asm to expand comments like in c (if set paste, don't work)
 autocmd FileType asm set formatoptions+=r
 
+" Return to last edit position when opening files (You want this!)
+autocmd BufReadPost *
+     \ if line("'\"") > 0 && line("'\"") <= line("$") |
+     \   exe "normal! g`\"" |
+     \ endif
+
+" Delete trailing white space on save, useful for Python and CoffeeScript ;)
+func! DeleteTrailingWS()
+  exe "normal mz"
+  %s/\s\+$//ge
+  exe "normal `z"
+endfunc
+autocmd BufWrite *.py :call DeleteTrailingWS()
+autocmd BufWrite *.coffee :call DeleteTrailingWS()
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Status line
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Reminder -- format markers:
+"   %< truncation point
+"   %n buffer number
+"   %f relative path to file
+"   %m modified flag [+] (modified), [-] (unmodifiable) or nothing
+"   %r readonly flag [RO]
+"   %y filetype [ruby]
+"   %= split point for left and right justification
+"   %-35. width specification
+"   %l current line number
+"   %L number of lines in buffer
+"   %c current column number
+"   %V current virtual column number (-n), if different from %c
+"   %P percentage through buffer
+"   %) end of width specification
+" Finally, %= allows you to split the left- and right-justification.
+
+" Always show the status line
+set laststatus=2
+
+" Returns true if paste mode is enabled
+function! HasPaste()
+    if &paste
+        return 'PASTE  '
+    en
+    return ''
+endfunction
 
 
-" custom functions
-" replace the //... comments by /* ... */
+" Format the status line
+"set statusline=\ %{HasPaste()}%F%m%h\ %w\ \ [%{getcwd()}%h]\ \ 
+"set statusline+=\ \ \  
+"set statusline+=\ Line:\ %-3.l/%-3.L               " Line number
+"set statusline+=\ (%c\)\ \ \                       " Column
+"set statusline+=%=                                 " align right
+"set statusline+=\ %{''.(&fenc!=''?&fenc:&enc).''}  " Encoding
+"set statusline+=%1*\ \ %r     s                   " Readonly?
+
+"set statusline=
+""set statusline+=\[%n]                                  "buffernr
+"set statusline=\ %{HasPaste()}
+"set statusline+=\ %<%F\                                "File+path
+"set statusline+=\ %y\                                  "FileType
+"set statusline+=\ %{''.(&fenc!=''?&fenc:&enc).''}      "Encoding
+"set statusline+=\ %{(&bomb?\",BOM\":\"\")}\            "Encoding2
+"set statusline+=\ %{&ff}\                              "FileFormat (dos/unix..) 
+"set statusline+=\ %{&spelllang}\                       "Spellanguage 
+"set statusline+=\ %=\ line:%l/%L\                      "Rownumber/total (%)
+"set statusline+=\ col:%3c\                            "Colnr
+"set statusline+=\ \ %m%r%w\ %P\ \                      "Modified? Readonly? Top/bot.
+
+
+set statusline=
+set statusline+=%0*\ %<%F%m\                             "File+path + modified ?
+set statusline+=%0*\ %y\                                 "FileType
+set statusline+=%0*\ %{''.(&fenc!=''?&fenc:&enc).''}     "Encoding
+set statusline+=%{(&bomb?\",BOM\":\"\")}                 "Encoding2
+set statusline+=:%{&ff}\                                 "FileFormat (dos/unix..) 
+set statusline+=\ %=\ Line:%l/%L\ (%3p%%)\               "Rownumber/total (%)
+set statusline+=\ col:%c\                                "Colnr
+set statusline+=%0*\ \ %r%w\                            "Readonly? Top/bot.
+
+hi StatusLine term=reverse ctermfg=white ctermbg=black
+hi User1 ctermfg=white ctermbg=black
+
+
+" statusbar
+"set laststatus=2
+"set statusline=
+"set statusline+=%0*\ %<%F\                                "File+path
+"set statusline+=%0*\ %y\                                  "FileType
+"set statusline+=%0*\ %{''.(&fenc!=''?&fenc:&enc).''}      "Encoding
+"set statusline+=\ %{(&bomb?\",BOM\":\"\")}\               "Encoding2
+"set statusline+=\ %{&ff}\                                 "FileFormat (dos/unix..) 
+"set statusline+=\ %=\ Line:%l/%L\ (%3p%%)\                "Rownumber/total (%)
+"set statusline+=\ col:%c\                                 "Colnr
+"set statusline+=%0*\ \ %m%r%w\                            "Modified? Readonly? Top/bot.
+
+"hi StatusLine term=reverse ctermfg=white ctermbg=black
+"hi User1 ctermfg=white ctermbg=black
+
+
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" => Functions
+"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" :call ExpandComments will replace the //... comments by /* ... */
 if !exists(":ExpandComments")
    function ExpandComments()
        %s#//\(.*\)$#/\*\1 \*/#g
    endfunction
 endif
 
-" add spaces inside parentheses
+" :call JavaFormat() will add spaces inside parentheses
 if !exists(":JavaFormat")
    function JavaFormat()
       %s/(\s*\(\S[^()]*\S\)\s*)/( \1 )/g
    endfunction
 endif
-
 function! LRefac(s, r)
 
     if( ! empty(&ft) )
@@ -187,7 +441,6 @@ function! LRefac(s, r)
         echo 'Sorry, function not defined for this filetype'
     endif
 endfunction
-
 function! LAutoRefactor()
    let curword = expand( "<cword>" )
    let replace = input( "replacement for " . curword . ": " )
@@ -200,5 +453,3 @@ function! LAutoRefactor()
     endif
     "echo <CR>
 endfunction
-
-
