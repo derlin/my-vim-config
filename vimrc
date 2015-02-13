@@ -1,9 +1,9 @@
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
- " Maintainer: 
- "      Lucy Linder
- "
- " Version: 
- "       1.0 - 11/02/15 15:43:36
+" Maintainer: 
+"      Lucy Linder
+"
+" Version: 
+"       1.0 - 11/02/15 15:43:36
 """""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 scriptencoding utf-8
 
@@ -33,15 +33,40 @@ try
     " colorscheme kolor
 catch
 endtry
- 
+
 set background=dark
- 
+function GuiTabLabel()
+    let label = ''
+    let bufnrlist = tabpagebuflist(v:lnum)
+
+    " Add '+' if one of the buffers in the tab page is modified
+    for bufnr in bufnrlist
+        if getbufvar(bufnr, "&modified")
+            let label = '+'
+            break
+        endif
+    endfor
+
+    " Append the number of windows in the tab page if more than one
+    let wincount = tabpagewinnr(v:lnum, '$')
+    if wincount > 1
+        let label .= wincount
+    endif
+    if label != ''
+        let label .= ' '
+    endif
+
+    " Append the buffer name
+    return label . bufname(bufnrlist[tabpagewinnr(v:lnum) - 1])
+endfunction
+
+
 " Set extra options when running in GUI mode
 if has("gui_running")
     set guioptions-=T
     set guioptions-=e
     set t_Co=256
-    set guitablabel=%M\ %t
+"    set guitablabel=%M\ %t
 endif
 
 
@@ -51,6 +76,10 @@ filetype indent on
 
 " Always show the tab line, even when only one tab
 set showtabline=2
+set guitablabel=%{GuiTabLabel()}            " tab label format
+hi TabLine ctermbg=black ctermfg=white      " unselected tab
+hi TabLineFill ctermbg=black ctermfg=black  " remaining of the tabline
+hi TabLineSel ctermbg=blue ctermfg=white    " selected tab
 
 " Set utf8 as standard encoding and en_US as the standard language
 set encoding=utf8
@@ -377,9 +406,10 @@ set statusline+=%0*\ %y\                                 "FileType
 set statusline+=%0*\ %{''.(&fenc!=''?&fenc:&enc).''}     "Encoding
 set statusline+=%{(&bomb?\",BOM\":\"\")}                 "Encoding2
 set statusline+=:%{&ff}\                                 "FileFormat (dos/unix..) 
+set statusline+=\ [cwd:%{getcwd()}%h]                    "Current pwd 
 set statusline+=\ %=\ Line:%l/%L\ (%3p%%)\               "Rownumber/total (%)
 set statusline+=\ col:%c\                                "Colnr
-set statusline+=%0*\ \ %r%w\                            "Readonly? Top/bot.
+set statusline+=%0*\ \ %r%w\                             "Readonly? Top/bot.
 
 hi StatusLine term=reverse ctermfg=white ctermbg=black
 hi User1 ctermfg=white ctermbg=black
